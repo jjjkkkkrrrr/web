@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  be:
+    build: ./backend
+    ports:
+      - "3000:3000"
+    environment:
+      # Đảm bảo các biến môi trường này khớp với cấu hình của backend của bạn
+      DATABASE_URL: postgres://user:password@db:5432/mydatabase
+    depends_on:
+      - db
+    volumes:
+      - ./backend:/app # Tùy chọn, để hot-reload khi dev
+
+  fe:
+    build: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - be
+    volumes:
+      - ./frontend:/app
+
+  db:
+    image: postgres:14-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydatabase
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+volumes:
+  postgres_data:
